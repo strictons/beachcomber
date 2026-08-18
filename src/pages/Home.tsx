@@ -1,8 +1,7 @@
 import NavBar from '../components/NavBar';
 import VideoBackground from '../components/VideoBackground';
 
-const HOME_VIDEO_SRC =
-  'https://beachcomberhotelandresort.com.au/wp-content/uploads/2022/10/bchrbg3.webm';
+const HOME_VIDEO_SRC = 'https://res.cloudinary.com/q4tmczid/video/upload/v1787028851/bchrbg-3.mp4';
 
 export default function Home() {
   return (

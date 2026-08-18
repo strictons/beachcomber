@@ -33,17 +33,33 @@ const img = (seed: string, w = 1200, h = 900) =>
 
 const PICSUM_URL = /^(.*\/seed\/[^/]+\/)(\d+)\/(\d+)$/;
 
+// Matches any Cloudinary delivery URL, e.g.
+// https://res.cloudinary.com/<cloud>/image/upload/<optional transforms>/<public_id>
+const CLOUDINARY_URL = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.*)$/;
+
 /**
- * Builds a srcSet requesting the same picsum image at several widths, so the
- * browser can fetch one sized to how large it's actually rendered instead of
- * always the full source dimensions.
+ * Builds a srcSet requesting the same image at several widths, so the browser
+ * can fetch one sized to how large it's actually rendered instead of always
+ * the full source dimensions. Understands both picsum.photos URLs (current
+ * placeholder images) and Cloudinary delivery URLs, so swapping the `image`/
+ * `gallery` URLs in this file over to Cloudinary is a drop-in replacement —
+ * no other code needs to change.
  */
 export function responsiveSrcSet(url: string, widths: number[]): string | undefined {
-  const match = url.match(PICSUM_URL);
-  if (!match) return undefined;
-  const [, base, sourceW, sourceH] = match;
-  const aspect = Number(sourceH) / Number(sourceW);
-  return widths.map((w) => `${base}${w}/${Math.round(w * aspect)} ${w}w`).join(', ');
+  const picsumMatch = url.match(PICSUM_URL);
+  if (picsumMatch) {
+    const [, base, sourceW, sourceH] = picsumMatch;
+    const aspect = Number(sourceH) / Number(sourceW);
+    return widths.map((w) => `${base}${w}/${Math.round(w * aspect)} ${w}w`).join(', ');
+  }
+
+  const cloudinaryMatch = url.match(CLOUDINARY_URL);
+  if (cloudinaryMatch) {
+    const [, base, publicId] = cloudinaryMatch;
+    return widths.map((w) => `${base}w_${w},c_limit,f_auto,q_auto/${publicId} ${w}w`).join(', ');
+  }
+
+  return undefined;
 }
 
 const callAhead = [{ day: 'Hours', hours: 'Please call ahead' }];
