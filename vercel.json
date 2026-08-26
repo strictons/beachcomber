@@ -1,7 +1,7 @@
 {
   "rewrites": [
     { "source": "/beachcomber-hotel-and-resort/assets/:path*", "destination": "/assets/:path*" },
-    { "source": "/beachcomber-hotel-and-resort/favicon.svg", "destination": "/favicon.svg" },
+    { "source": "/beachcomber-hotel-and-resort/favicon.png", "destination": "/favicon.png" },
     { "source": "/beachcomber-hotel-and-resort", "destination": "/index.html" },
     { "source": "/beachcomber-hotel-and-resort/:path*", "destination": "/index.html" }
   ]
