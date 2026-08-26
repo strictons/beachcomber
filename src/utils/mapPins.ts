@@ -1,7 +1,16 @@
 import type { Root } from 'react-dom/client';
-import { Map as MapLibreMap } from 'maplibre-gl';
+import { Map as MapLibreMap, setWorkerUrl } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import type { Business, BusinessType } from '../data/businesses';
 import { categoryIcons, hotelIcon } from '../data/categoryIcons';
+
+// MapLibre works out its worker script's URL from `import.meta.url` at
+// runtime, assuming an unbundled sibling file — a build (unlike `vite dev`,
+// which serves straight out of node_modules) bundles everything into hashed
+// chunks with nothing actually at that path, so the worker silently 404s and
+// the map never paints any tiles. Pointing it at the worker as a real
+// Vite-emitted asset keeps the URL valid after bundling.
+setWorkerUrl(maplibreWorkerUrl);
 
 export const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
 

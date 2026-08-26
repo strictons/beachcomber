@@ -9,6 +9,7 @@ export default function NavBar({
   backTo,
   sticky = false,
   title,
+  mobileTitle,
   scrolled = false,
 }: {
   theme?: 'light' | 'dark';
@@ -16,6 +17,8 @@ export default function NavBar({
   backTo?: string;
   sticky?: boolean;
   title?: string;
+  /** Shorter stand-in for `title` below the `sm` breakpoint, where the full title may not fit next to the logo. */
+  mobileTitle?: string;
   /**
    * For a `variant="back"`, non-sticky bar (the transparent one floating over
    * a Hero image): switches it to fixed positioning with a blurred
@@ -53,13 +56,32 @@ export default function NavBar({
                 aria-hidden="true"
                 className={`h-5 shrink-0 w-px sm:h-6 ${theme === 'light' ? 'bg-white/30' : 'bg-[#1d1d1f]/15'}`}
               />
-              <span
-                className={`min-w-0 flex-1 truncate whitespace-nowrap font-heading text-[11px] font-normal uppercase tracking-[0.03em] min-[400px]:text-[15px] min-[400px]:tracking-[0.06em] sm:text-[19px] sm:tracking-[0.08em] ${
-                  theme === 'light' ? 'text-white/75' : 'text-[#1d1d1f]/45'
-                }`}
-              >
-                {title}
-              </span>
+              {mobileTitle ? (
+                <>
+                  <span
+                    className={`min-w-0 flex-1 truncate whitespace-nowrap font-heading text-[12px] font-normal uppercase tracking-[0.02em] min-[400px]:text-[15px] min-[400px]:tracking-[0.06em] sm:hidden ${
+                      theme === 'light' ? 'text-white/75' : 'text-[#1d1d1f]/45'
+                    }`}
+                  >
+                    {mobileTitle}
+                  </span>
+                  <span
+                    className={`hidden min-w-0 flex-1 truncate whitespace-nowrap font-heading sm:block sm:text-[19px] sm:tracking-[0.08em] ${
+                      theme === 'light' ? 'text-white/75' : 'text-[#1d1d1f]/45'
+                    }`}
+                  >
+                    {title}
+                  </span>
+                </>
+              ) : (
+                <span
+                  className={`min-w-0 flex-1 truncate whitespace-nowrap font-heading text-[11px] font-normal uppercase tracking-[0.03em] min-[400px]:text-[15px] min-[400px]:tracking-[0.06em] sm:text-[19px] sm:tracking-[0.08em] ${
+                    theme === 'light' ? 'text-white/75' : 'text-[#1d1d1f]/45'
+                  }`}
+                >
+                  {title}
+                </span>
+              )}
             </>
           )}
         </div>

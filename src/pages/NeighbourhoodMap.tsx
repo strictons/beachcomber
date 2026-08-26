@@ -359,7 +359,7 @@ export default function NeighbourhoodMap() {
 
   return (
     <div className="flex h-[100dvh] flex-col bg-[#edd9ca]">
-      <NavBar theme="dark" sticky title="Neighbourhood Map" />
+      <NavBar theme="dark" sticky title="Neighbourhood Map" mobileTitle="Map" />
 
       <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-black/5 bg-[#edd9ca] px-6 py-3 sm:px-10">
         {FILTERS.map((f) => {

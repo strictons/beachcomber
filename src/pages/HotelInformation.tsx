@@ -5,7 +5,7 @@ import { responsiveSrcSet } from '../data/businesses';
 export default function HotelInformation() {
   return (
     <div className="min-h-screen bg-[#edd9ca]">
-      <NavBar theme="dark" sticky title="Hotel Information" />
+      <NavBar theme="dark" sticky title="Hotel Information" mobileTitle="Hotel Info" />
 
       <div className="mx-auto max-w-2xl px-6 py-10 sm:px-10 sm:py-14">
         <div className="mb-10 aspect-[3/2] overflow-hidden rounded-xl bg-neutral-100">
