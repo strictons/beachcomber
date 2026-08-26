@@ -81,3 +81,13 @@ img {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* PdfViewer draws its own always-visible scrollbar tracks (so they read
+   consistently on mobile, where native ones are overlay-only and never
+   stay visible) — hide the native one so they don't double up. */
+.pdf-scroll-hide {
+  scrollbar-width: none;
+}
+.pdf-scroll-hide::-webkit-scrollbar {
+  display: none;
+}
