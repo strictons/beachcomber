@@ -4,7 +4,7 @@ import { LOGO_URL } from '../data/media';
 const COVER_BLUE = '#567791';
 
 export default function Logo({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
-  const sizeClass = 'h-6 sm:h-7';
+  const sizeClass = 'h-5 min-[400px]:h-6 sm:h-7';
 
   return (
     <Link to="/" className="flex items-center select-none" aria-label="The Beachcomber Hotel and Resort — home">

@@ -361,7 +361,7 @@ export default function NeighbourhoodMap() {
     <div className="flex h-[100dvh] flex-col bg-[#edd9ca]">
       <NavBar theme="dark" sticky title="Neighbourhood Map" />
 
-      <div className="flex shrink-0 items-center gap-2 border-b border-black/5 bg-[#edd9ca] px-6 py-3 sm:px-10">
+      <div className="flex shrink-0 items-center gap-2 overflow-x-auto border-b border-black/5 bg-[#edd9ca] px-6 py-3 sm:px-10">
         {FILTERS.map((f) => {
           const active = filter === f.id;
 
@@ -370,7 +370,7 @@ export default function NeighbourhoodMap() {
               <button
                 key={f.id}
                 onClick={() => setFilter('all')}
-                className={`rounded-full px-3.5 py-1.5 font-heading text-[11px] font-medium uppercase tracking-[0.08em] transition-colors sm:text-[12px] ${
+                className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 font-heading text-[11px] font-medium uppercase tracking-[0.08em] transition-colors sm:text-[12px] ${
                   active ? 'bg-[#1d1d1f] text-white' : 'bg-white/70 text-[#1d1d1f]/60 hover:bg-white'
                 }`}
               >
@@ -384,7 +384,7 @@ export default function NeighbourhoodMap() {
               key={f.id}
               onClick={() => setFilter(f.id)}
               style={{ background: CATEGORY_COLOR[f.id] }}
-              className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 font-heading text-[11px] font-medium uppercase tracking-[0.08em] text-white transition-opacity sm:text-[12px] ${
+              className={`flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 py-1.5 font-heading text-[11px] font-medium uppercase tracking-[0.08em] text-white transition-opacity sm:text-[12px] ${
                 active ? 'opacity-100 shadow-[0_3px_10px_-3px_rgba(0,0,0,0.4)]' : 'opacity-50 hover:opacity-75'
               }`}
             >

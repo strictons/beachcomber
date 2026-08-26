@@ -142,7 +142,7 @@ export default function BusinessDetail() {
               return (
                 <li
                   key={h.day}
-                  className={`flex items-baseline justify-between gap-4 rounded-lg px-3 py-2 text-[13px] ${
+                  className={`flex flex-col gap-0.5 rounded-lg px-3 py-2.5 text-[13px] sm:flex-row sm:items-baseline sm:justify-between sm:gap-4 sm:py-2 ${
                     isToday ? 'bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)]' : ''
                   }`}
                 >
@@ -155,7 +155,7 @@ export default function BusinessDetail() {
                     )}
                   </span>
                   <span
-                    className={`text-right ${
+                    className={`sm:text-right ${
                       isToday ? 'font-semibold text-[#1d1d1f]' : 'font-medium text-neutral-500'
                     }`}
                   >

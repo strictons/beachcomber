@@ -31,19 +31,19 @@ export default function NavBar({
   const iconColor = effectiveTheme === 'light' ? 'text-white' : 'text-[#1d1d1f]';
 
   const containerClass = sticky
-    ? 'sticky top-0 z-30 flex items-center justify-between border-b border-white/70 bg-[#edd9ca] px-6 pt-6 pb-4 sm:px-10 sm:pt-8 sm:pb-5'
+    ? 'sticky top-0 z-30 flex items-center justify-between border-b border-white/70 bg-[#edd9ca] px-4 pt-6 pb-4 sm:px-10 sm:pt-8 sm:pb-5'
     : floatingBack
-      ? `fixed inset-x-0 top-0 z-30 flex items-center justify-between px-6 pt-6 sm:px-10 sm:pt-8 transition-all duration-300 ease-out ${
+      ? `fixed inset-x-0 top-0 z-30 flex items-center justify-between px-4 pt-6 sm:px-10 sm:pt-8 transition-all duration-300 ease-out ${
           scrolled
             ? 'border-b border-black/5 bg-[#edd9ca]/85 pb-4 backdrop-blur-md sm:pb-5'
             : 'border-b border-transparent bg-transparent pb-0'
         }`
-      : 'absolute inset-x-0 top-0 z-10 flex items-center justify-between px-6 pt-6 sm:px-10 sm:pt-8';
+      : 'absolute inset-x-0 top-0 z-10 flex items-center justify-between px-4 pt-6 sm:px-10 sm:pt-8';
 
   return (
     <div className={containerClass}>
       {variant === 'logo' ? (
-        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-3">
           <div className="shrink-0">
             <Logo theme={theme} />
           </div>
@@ -54,7 +54,7 @@ export default function NavBar({
                 className={`h-5 shrink-0 w-px sm:h-6 ${theme === 'light' ? 'bg-white/30' : 'bg-[#1d1d1f]/15'}`}
               />
               <span
-                className={`min-w-0 flex-1 truncate whitespace-nowrap font-heading text-[15px] font-normal uppercase tracking-[0.06em] sm:text-[19px] sm:tracking-[0.08em] ${
+                className={`min-w-0 flex-1 truncate whitespace-nowrap font-heading text-[11px] font-normal uppercase tracking-[0.03em] min-[400px]:text-[15px] min-[400px]:tracking-[0.06em] sm:text-[19px] sm:tracking-[0.08em] ${
                   theme === 'light' ? 'text-white/75' : 'text-[#1d1d1f]/45'
                 }`}
               >
@@ -64,7 +64,7 @@ export default function NavBar({
           )}
         </div>
       ) : (
-        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 sm:gap-3">
           <button
             onClick={() => (backTo ? navigate(backTo) : navigate(-1))}
             aria-label="Go back"

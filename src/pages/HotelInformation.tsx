@@ -24,12 +24,17 @@ export default function HotelInformation() {
 
         <div className="divide-y divide-neutral-100 border-t border-neutral-100">
           {infoItems.map((item) => (
-            <div key={item.label} className="flex items-baseline justify-between gap-4 py-4">
+            <div
+              key={item.label}
+              className="flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4"
+            >
               <span className="text-[14px] text-neutral-500">{item.label}</span>
-              <span className="truncate text-right text-[14px] font-medium text-[#1d1d1f]">
+              <span className="text-[14px] font-medium text-[#1d1d1f] sm:truncate sm:text-right">
                 {item.value}
                 {item.detail && (
-                  <span className="ml-1.5 font-normal italic text-neutral-400">{item.detail}</span>
+                  <span className="block font-normal italic text-neutral-400 sm:ml-1.5 sm:inline">
+                    {item.detail}
+                  </span>
                 )}
               </span>
             </div>
