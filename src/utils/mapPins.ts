@@ -1,15 +1,23 @@
 import type { Root } from 'react-dom/client';
 import { Map as MapLibreMap, setWorkerUrl } from 'maplibre-gl';
-import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import type { Business, BusinessType } from '../data/businesses';
 import { categoryIcons, hotelIcon } from '../data/categoryIcons';
 
 // MapLibre works out its worker script's URL from `import.meta.url` at
 // runtime, assuming an unbundled sibling file — a build (unlike `vite dev`,
 // which serves straight out of node_modules) bundles everything into hashed
-// chunks with nothing actually at that path, so the worker silently 404s and
-// the map never paints any tiles. Pointing it at the worker as a real
-// Vite-emitted asset keeps the URL valid after bundling.
+// chunks with nothing at that path, so the worker script 404s and the map
+// never paints any tiles (its background/pins/attribution still render,
+// since those don't depend on the worker, which is what makes this failure
+// mode look like a blank/greyed-out map rather than an obvious crash).
+// `?worker&url` (rather than plain `?url`) is required here, not just
+// stylistic — the worker file itself `import`s a sibling
+// maplibre-gl-shared.mjs, and plain `?url` copies the file's raw bytes
+// without resolving that import, so the worker's own module load 404s in
+// exactly the same way even once its own URL is fixed. `?worker` makes Vite
+// bundle the worker's whole import graph into one self-contained chunk
+// before handing back its URL.
 setWorkerUrl(maplibreWorkerUrl);
 
 export const MAP_STYLE = 'https://tiles.openfreemap.org/styles/positron';
