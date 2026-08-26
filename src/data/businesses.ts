@@ -1,3 +1,12 @@
+import {
+  eatAndDrinkImages,
+  thingsToDoImages,
+  resolveImage,
+  type BusinessImages,
+  type PositionedImage,
+} from './media';
+import { contactInfo as hotelContactInfo } from './hotelInfo';
+
 export type BusinessType = 'eat-drink' | 'things-to-do';
 
 export interface Schedule {
@@ -19,52 +28,70 @@ export interface Business {
   distanceKm?: number;
   tagline: string;
   description: string;
-  image: string;
-  gallery: string[];
+  image: PositionedImage;
+  gallery: PositionedImage[];
   hours: { day: string; hours: string }[];
   /** Structured hours for computing open/closed status. Undefined = hours unknown. */
   schedule?: Schedule[];
-  phone: string;
+  phone?: string;
   address: string;
+  /** Typical driving time in minutes from the hotel. Only set for Nearby businesses. */
+  minutesFromHotel?: number;
+  website?: string;
+  email?: string;
+  /** Coordinates for the Neighbourhood Map. Only set for Nearby businesses. */
+  lat?: number;
+  lng?: number;
 }
 
-const img = (seed: string, w = 1200, h = 900) =>
-  `https://picsum.photos/seed/${seed}/${w}/${h}`;
+/** Strips the protocol/www/trailing slash from a URL for compact display, e.g. "example.com". */
+export function formatWebsiteLabel(url: string): string {
+  return url.replace(/^https?:\/\//, '').replace(/^www\./, '').replace(/\/$/, '');
+}
 
-const PICSUM_URL = /^(.*\/seed\/[^/]+\/)(\d+)\/(\d+)$/;
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-// Matches any Cloudinary delivery URL, e.g.
-// https://res.cloudinary.com/<cloud>/image/upload/<optional transforms>/<public_id>
-const CLOUDINARY_URL = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.*)$/;
+function dayIndex(token: string): number | null {
+  const key = token.trim().slice(0, 3).toLowerCase();
+  const idx = WEEKDAYS.findIndex((d) => d.toLowerCase() === key);
+  return idx === -1 ? null : idx;
+}
+
+/** Whether a label like "Every day", "Monday" or "Tue – Sun" covers the given weekday (0 = Sun). */
+function labelCoversDay(label: string, dayIdx: number): boolean {
+  if (/every day/i.test(label)) return true;
+  const [startToken, endToken] = label.split('–').map((s) => s.trim());
+  const start = dayIndex(startToken);
+  if (start === null) return false;
+  if (!endToken) return start === dayIdx;
+  const end = dayIndex(endToken);
+  if (end === null) return start === dayIdx;
+  return start <= end ? dayIdx >= start && dayIdx <= end : dayIdx >= start || dayIdx <= end;
+}
 
 /**
- * Builds a srcSet requesting the same image at several widths, so the browser
- * can fetch one sized to how large it's actually rendered instead of always
- * the full source dimensions. Understands both picsum.photos URLs (current
- * placeholder images) and Cloudinary delivery URLs, so swapping the `image`/
- * `gallery` URLs in this file over to Cloudinary is a drop-in replacement —
- * no other code needs to change.
+ * The hours entries relevant to today, for a compact "today's hours" summary.
+ * Falls back to the full list if nothing matches (shouldn't normally happen).
  */
-export function responsiveSrcSet(url: string, widths: number[]): string | undefined {
-  const picsumMatch = url.match(PICSUM_URL);
-  if (picsumMatch) {
-    const [, base, sourceW, sourceH] = picsumMatch;
-    const aspect = Number(sourceH) / Number(sourceW);
-    return widths.map((w) => `${base}${w}/${Math.round(w * aspect)} ${w}w`).join(', ');
-  }
-
-  const cloudinaryMatch = url.match(CLOUDINARY_URL);
-  if (cloudinaryMatch) {
-    const [, base, publicId] = cloudinaryMatch;
-    return widths.map((w) => `${base}w_${w},c_limit,f_auto,q_auto/${publicId} ${w}w`).join(', ');
-  }
-
-  return undefined;
+export function todaysHours(business: Business): { day: string; hours: string }[] {
+  const todayIdx = new Date().getDay();
+  const matches = business.hours.filter((h) => labelCoversDay(h.day, todayIdx));
+  return matches.length > 0 ? matches : business.hours;
 }
 
-const callAhead = [{ day: 'Hours', hours: 'Please call ahead' }];
+/** Looks up a business's hero/gallery photos in media.ts by id and merges them in. */
+function withImages(
+  business: Omit<Business, 'image' | 'gallery'>,
+  images: Record<string, BusinessImages>
+): Business {
+  const media = images[business.id];
+  if (!media) {
+    throw new Error(`No images found in src/data/media.ts for business "${business.id}"`);
+  }
+  return { ...business, image: resolveImage(media.hero), gallery: media.gallery.map(resolveImage) };
+}
 
-export const eatAndDrink: Business[] = [
+const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
   {
     id: 'the-beachie-bar-and-bistro',
     type: 'eat-drink',
@@ -75,14 +102,8 @@ export const eatAndDrink: Business[] = [
     tagline: 'Pub classics and cocktails right on the water.',
     description:
       "Our bar and bistro serves delicious pub classics including burgers, steaks, seafood and wood-fired pizzas, paired with your favourite beers, wines and cocktails — a fantastic spot to grab a seat and enjoy dinner by the water.",
-    image: img('beachie-bar-hero'),
-    gallery: [img('beachie-bar-1'), img('beachie-bar-2'), img('beachie-bar-3'), img('beachie-bar-4')],
-    hours: [
-      { day: 'Every day', hours: '11:00 AM – Late' },
-      { day: 'Room Service', hours: 'Until 9:00 PM' },
-    ],
+    hours: [{ day: 'Every day', hours: '11:00 AM – Late' }],
     schedule: [{ open: 11 * 60, close: 60 }],
-    phone: '(02) 4317 2845',
     address: 'Level 3, The Beachcomber Hotel and Resort',
   },
   {
@@ -95,12 +116,12 @@ export const eatAndDrink: Business[] = [
     tagline: 'Home to our daily breakfast buffet.',
     description:
       'Pelicans is home to our daily breakfast buffet, serving hot and continental favourites with barista-made coffee to start your day. On select dates, it also opens for exclusive dining experiences, hosting wine tastings and special events.',
-    image: img('pelicans-hero'),
-    gallery: [img('pelicans-1'), img('pelicans-2'), img('pelicans-3'), img('pelicans-4')],
     hours: [{ day: 'Breakfast, every day', hours: '7:00 AM – 10:00 AM' }],
     schedule: [{ open: 7 * 60, close: 10 * 60 }],
     phone: '(02) 4317 2845',
     address: 'Level 3, The Beachcomber Hotel and Resort',
+    website: hotelContactInfo.website,
+    email: hotelContactInfo.email,
   },
   {
     id: 'bbs-soul-kitchen',
@@ -112,11 +133,20 @@ export const eatAndDrink: Business[] = [
     tagline: 'A taste of the American South in Toukley.',
     description:
       "BB's Soul Kitchen brings the rich flavours and warm hospitality of the American South to the Central Coast. Blending traditional soul food with a modern Australian touch, the menu showcases locally sourced ingredients, slow-cooked classics and thoughtfully crafted seasonal dishes. Whether you're stopping in for a casual lunch or settling in for a more intimate dinner, expect bold flavours, generous portions and a welcoming atmosphere.",
-    image: img('bbs-soul-kitchen-hero'),
-    gallery: [img('bbs-1'), img('bbs-2'), img('bbs-3'), img('bbs-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Monday', hours: 'Closed' },
+      { day: 'Tue – Wed', hours: '5:00 PM – 9:00 PM' },
+      { day: 'Thursday', hours: '5:00 PM – 10:00 PM' },
+      { day: 'Fri – Sat', hours: '12:00 PM – 10:00 PM' },
+      { day: 'Sunday', hours: '5:00 PM – 8:00 PM' },
+    ],
     phone: '0412 190 124',
     address: '5/243-245 Main Rd, Toukley',
+    minutesFromHotel: 2,
+    website: 'https://www.bbsoulkitchen.com.au/',
+    email: 'contact@bbsoulkitchen.com.au',
+    lat: -33.26405,
+    lng: 151.5407,
   },
   {
     id: 'johnny-tapas',
@@ -128,11 +158,19 @@ export const eatAndDrink: Business[] = [
     tagline: 'Modern Mediterranean tapas and cocktails.',
     description:
       'A modern Mediterranean restaurant serving tapas-style share plates, wood-fired favourites and cocktails.',
-    image: img('johnny-tapas-hero'),
-    gallery: [img('johnny-tapas-1'), img('johnny-tapas-2'), img('johnny-tapas-3'), img('johnny-tapas-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Mon – Tue', hours: 'Closed' },
+      { day: 'Wed – Fri', hours: '5:00 PM – 10:00 PM' },
+      { day: 'Saturday', hours: '12:00 PM – 10:00 PM' },
+      { day: 'Sunday', hours: '12:00 PM – 8:00 PM' },
+    ],
     phone: '(02) 4396 4656',
     address: '7 Mitchell St, Norah Head',
+    minutesFromHotel: 7,
+    website: 'https://www.johnnytapas.com.au/',
+    email: 'bookings@johnnytapas.com.au',
+    lat: -33.2793851,
+    lng: 151.5651967,
   },
   {
     id: 'motel-mezza',
@@ -144,11 +182,18 @@ export const eatAndDrink: Business[] = [
     tagline: 'Middle Eastern food and cocktails with a retro motel feel.',
     description:
       'Middle Eastern food and cocktails in a social bar designed to feel like the lobby of a 1930s motel.',
-    image: img('motel-mezza-hero'),
-    gallery: [img('motel-mezza-1'), img('motel-mezza-2'), img('motel-mezza-3'), img('motel-mezza-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Sun – Mon', hours: 'Closed' },
+      { day: 'Tue – Thu', hours: '5:00 PM – 9:00 PM' },
+      { day: 'Fri – Sat', hours: '4:30 PM – 9:30 PM' },
+    ],
     phone: '(02) 4330 2198',
     address: '98 Pacific Hwy, Wyong',
+    minutesFromHotel: 13,
+    website: 'https://www.motelmezza.com.au/',
+    email: 'enjoy@motelmezza.com.au',
+    lat: -33.2846912,
+    lng: 151.4246124,
   },
   {
     id: 'wyong-milk-factory',
@@ -160,11 +205,21 @@ export const eatAndDrink: Business[] = [
     tagline: 'A heritage dairy factory reborn as a dining precinct.',
     description:
       "A heritage precinct that was once a thriving dairy factory, beautifully restored into one of the Central Coast's most distinctive destinations. Home to a riverside tavern, local artisan producers, cafés, family-friendly spaces and events.",
-    image: img('wyong-milk-factory-hero'),
-    gallery: [img('wmf-1'), img('wmf-2'), img('wmf-3'), img('wmf-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Mon – Tue', hours: '10:00 AM – 3:00 PM' },
+      { day: 'Wednesday', hours: '10:00 AM – 8:00 PM' },
+      { day: 'Thursday', hours: '10:00 AM – 9:30 PM' },
+      { day: 'Friday', hours: '10:00 AM – 10:30 PM' },
+      { day: 'Saturday', hours: '8:00 AM – 11:00 PM' },
+      { day: 'Sunday', hours: '8:00 AM – 3:30 PM' },
+    ],
     phone: '0478 475 669',
     address: '141 Alison Rd, Wyong',
+    minutesFromHotel: 13,
+    website: 'https://www.wyongmilkfactory.com.au/',
+    email: 'info@wyongmilkfactory.com.au',
+    lat: -33.279172,
+    lng: 151.4174592,
   },
   {
     id: 'mexicoast-cantina',
@@ -176,11 +231,20 @@ export const eatAndDrink: Business[] = [
     tagline: 'Bold Baja-inspired Mexican dining and margaritas.',
     description:
       'Drawing inspiration from the vibrant cantinas of the Mexican Baja Peninsula, this local favourite brings an authentic slice of traditional Mexican dining to the Central Coast, with a lively social atmosphere, bold flavours and margaritas.',
-    image: img('mexicoast-cantina-hero'),
-    gallery: [img('mexicoast-1'), img('mexicoast-2'), img('mexicoast-3'), img('mexicoast-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Monday', hours: 'Closed' },
+      { day: 'Tuesday', hours: '5:00 PM – 8:00 PM' },
+      { day: 'Wed – Thu', hours: '5:00 PM – 8:30 PM' },
+      { day: 'Fri – Sat', hours: '12:00 PM – Late' },
+      { day: 'Sunday', hours: '5:00 PM – 7:30 PM' },
+    ],
     phone: '(02) 4396 6942',
     address: '9-10/243 Main Rd, Toukley',
+    minutesFromHotel: 2,
+    website: 'https://www.mexicoastcantina.com/',
+    email: 'admin@mexicoastcantina.com',
+    lat: -33.26415,
+    lng: 151.5406,
   },
   {
     id: 'cue-and-crew',
@@ -190,13 +254,19 @@ export const eatAndDrink: Business[] = [
     location: 'Nearby',
     distanceKm: 9,
     tagline: 'Low-and-slow American-inspired barbecue.',
-    description:
-      'An American-inspired smokehouse dedicated to the craft of low-and-slow barbecued meats.',
-    image: img('cue-and-crew-hero'),
-    gallery: [img('cue-crew-1'), img('cue-crew-2'), img('cue-crew-3'), img('cue-crew-4')],
-    hours: callAhead,
+    description: 'An American-inspired smokehouse dedicated to the craft of low-and-slow barbecued meats.',
+    hours: [
+      { day: 'Sun – Mon', hours: 'Closed' },
+      { day: 'Tue – Thu', hours: '5:30 PM – 8:00 PM' },
+      { day: 'Fri – Sat', hours: '11:00 AM – 2:00 PM, 5:30 PM – 8:00 PM' },
+    ],
     phone: '(02) 4072 1477',
     address: '2 Reliance Dr, Tuggerah',
+    minutesFromHotel: 15,
+    website: 'https://www.cueandcrew.com/',
+    email: 'manager.cueandcrew@gmail.com',
+    lat: -33.3134573,
+    lng: 151.4216281,
   },
   {
     id: 'the-savoy-bar-and-music',
@@ -208,65 +278,34 @@ export const eatAndDrink: Business[] = [
     tagline: 'A restored cinema with live music and great food.',
     description:
       'A restored cinema with great food, drinks and live musical performances by local and touring artists.',
-    image: img('savoy-bar-hero'),
-    gallery: [img('savoy-1'), img('savoy-2'), img('savoy-3'), img('savoy-4')],
-    hours: callAhead,
+    hours: [{ day: 'Every day', hours: '12:00 PM – Late' }],
     phone: '0406 461 122',
     address: '2/391 The Entrance Rd, Long Jetty',
+    minutesFromHotel: 15,
+    website: 'https://www.thesavoybarandmusic.com.au/',
+    email: 'welcome@thesavoybarandmusic.com.au',
+    lat: -33.3653702,
+    lng: 151.4766742,
   },
 ];
 
-export const thingsToDo: Business[] = [
+const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
   {
     id: 'live-entertainment',
     type: 'things-to-do',
     name: 'Live Entertainment',
-    category: 'Live Music',
+    category: "What's On",
     location: 'In-Hotel',
     distanceKm: 0,
     tagline: 'Weekly live music and entertainment at the bar.',
     description:
       "Our bar hosts weekly events including soloists, bands, DJs and live sport feeds. Scan the in-venue QR code to see what's on.",
-    image: img('live-entertainment-hero'),
-    gallery: [img('live-ent-1'), img('live-ent-2'), img('live-ent-3'), img('live-ent-4')],
     hours: [{ day: 'Every day', hours: '11:00 AM – Late' }],
     schedule: [{ open: 11 * 60, close: 60 }],
     phone: '(02) 4317 2845',
     address: 'Level 3, The Beachcomber Hotel and Resort',
-  },
-  {
-    id: 'heated-pool-and-spa',
-    type: 'things-to-do',
-    name: 'Heated Pool & Spa',
-    category: 'Pool & Spa',
-    location: 'In-Hotel',
-    distanceKm: 0,
-    tagline: 'A heated pool available to all guests, year-round.',
-    description:
-      'Our pool is heated and available for all guests. Access is via level 1 with your keycard, and the pool bar operates throughout summer.',
-    image: img('heated-pool-hero'),
-    gallery: [img('pool-spa-1'), img('pool-spa-2'), img('pool-spa-3'), img('pool-spa-4')],
-    hours: [{ day: 'Every day', hours: '8:00 AM – 8:00 PM' }],
-    schedule: [{ open: 8 * 60, close: 20 * 60 }],
-    phone: '(02) 4317 2845',
-    address: 'Level 1, The Beachcomber Hotel and Resort',
-  },
-  {
-    id: 'kids-playground',
-    type: 'things-to-do',
-    name: 'Kids Playground',
-    category: 'Playground',
-    location: 'In-Hotel',
-    distanceKm: 0,
-    tagline: 'Lakeside play space for the kids to run free.',
-    description:
-      'Let the kids run free as you relax down by the lake. Order some lunch, grab a table and enjoy the sun.',
-    image: img('kids-playground-hero'),
-    gallery: [img('kids-play-1'), img('kids-play-2'), img('kids-play-3'), img('kids-play-4')],
-    hours: [{ day: 'Every day', hours: '8:00 AM – 8:00 PM' }],
-    schedule: [{ open: 8 * 60, close: 20 * 60 }],
-    phone: '(02) 4317 2845',
-    address: 'Lakeside, The Beachcomber Hotel and Resort',
+    website: hotelContactInfo.website,
+    email: hotelContactInfo.email,
   },
   {
     id: 'saturday-yoga',
@@ -278,12 +317,40 @@ export const thingsToDo: Business[] = [
     tagline: 'Complimentary lakeside yoga every Saturday morning.',
     description:
       'Join us at 8am on Saturday mornings for a complimentary yoga session by the lake. No experience or equipment is required.',
-    image: img('saturday-yoga-hero'),
-    gallery: [img('yoga-1'), img('yoga-2'), img('yoga-3'), img('yoga-4')],
     hours: [{ day: 'Saturday', hours: '8:00 AM' }],
     schedule: [{ days: [6], open: 8 * 60, close: 9 * 60 }],
     phone: '(02) 4317 2845',
     address: 'Lakeside, The Beachcomber Hotel and Resort',
+    website: hotelContactInfo.website,
+    email: hotelContactInfo.email,
+  },
+  {
+    id: 'heated-pool-and-spa',
+    type: 'things-to-do',
+    name: 'Heated Pool & Spa',
+    category: 'Pool & Spa',
+    location: 'In-Hotel',
+    distanceKm: 0,
+    tagline: 'A heated pool available to all guests, year-round.',
+    description:
+      'Our pool is heated and available for all guests. Access is via level 1 with your keycard, and the pool bar operates throughout summer.',
+    hours: [{ day: 'Every day', hours: '8:00 AM – 8:00 PM' }],
+    schedule: [{ open: 8 * 60, close: 20 * 60 }],
+    address: 'Level 1, The Beachcomber Hotel and Resort',
+  },
+  {
+    id: 'kids-playground',
+    type: 'things-to-do',
+    name: 'Kids Playground',
+    category: 'Playground',
+    location: 'In-Hotel',
+    distanceKm: 0,
+    tagline: 'Lakeside play space for the kids to run free.',
+    description:
+      'Let the kids run free as you relax down by the lake. Order some lunch, grab a table and enjoy the sun. Access is via level 3, through the bistro.',
+    hours: [{ day: 'Every day', hours: '8:00 AM – 8:00 PM' }],
+    schedule: [{ open: 8 * 60, close: 20 * 60 }],
+    address: 'Level 3, The Beachcomber Hotel and Resort',
   },
   {
     id: 'australian-reptile-park',
@@ -295,11 +362,14 @@ export const thingsToDo: Business[] = [
     tagline: "Australia's Best Major Tourist Attraction, 2023.",
     description:
       "The Australian Reptile Park offers an unforgettable experience for visitors of all ages, combining hands-on wildlife encounters with engaging and educational presentations. From kangaroos and koalas to alligators, giant tortoises and one of Australia's largest collections of reptiles, guests can hand-feed animals, enjoy interactive keeper talks and explore the park at their own pace.",
-    image: img('reptile-park-hero'),
-    gallery: [img('reptile-1'), img('reptile-2'), img('reptile-3'), img('reptile-4')],
-    hours: callAhead,
+    hours: [{ day: 'Every day', hours: '9:00 AM – 5:00 PM' }],
     phone: '(02) 4340 1022',
     address: 'Pacific Hwy, Somersby',
+    minutesFromHotel: 30,
+    website: 'https://www.reptilepark.com.au',
+    email: 'admin@reptilepark.com.au',
+    lat: -33.4193524,
+    lng: 151.2860216,
   },
   {
     id: 'broken-bay-pearl-farm',
@@ -311,11 +381,17 @@ export const thingsToDo: Business[] = [
     tagline: 'Discover the secrets of pearl farming on the Hawkesbury River.',
     description:
       'Take to the water and discover the secrets of pearl farming along the stunning Hawkesbury River. Offers guided tours, scenic boat cruises, handcrafted jewellery and hands-on oyster farming experiences.',
-    image: img('pearl-farm-hero'),
-    gallery: [img('pearl-1'), img('pearl-2'), img('pearl-3'), img('pearl-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Monday', hours: 'Closed' },
+      { day: 'Tue – Sun', hours: '10:00 AM – 4:00 PM (tours by booking)' },
+    ],
     phone: '0488 361 042',
     address: '12 Kowan Rd, Mooney Mooney',
+    minutesFromHotel: 38,
+    website: 'https://brokenbaypearlfarm.com.au',
+    email: 'hello@brokenbaypearlfarm.com.au',
+    lat: -33.5267055,
+    lng: 151.2011883,
   },
   {
     id: 'chocolate-factory',
@@ -326,11 +402,14 @@ export const thingsToDo: Business[] = [
     distanceKm: 25,
     tagline: 'The sweetest place on the Central Coast.',
     description: 'Shop handcrafted chocolates or book in for an immersive factory tour.',
-    image: img('chocolate-factory-hero'),
-    gallery: [img('choc-1'), img('choc-2'), img('choc-3'), img('choc-4')],
-    hours: callAhead,
+    hours: [{ day: 'Every day', hours: '9:00 AM – 4:00 PM' }],
     phone: '(02) 4322 3222',
     address: '6 Jusfrute Dr, West Gosford',
+    minutesFromHotel: 20,
+    website: 'https://chocolatefactorygosford.com.au',
+    email: 'info@chocolatefactorygosford.com.au',
+    lat: -33.4297807,
+    lng: 151.3132326,
   },
   {
     id: 'iris-lodge-alpacas',
@@ -342,11 +421,17 @@ export const thingsToDo: Business[] = [
     tagline: 'Ethical alpaca meet-and-greets and a premium brunch.',
     description:
       'A unique opportunity for ethical meet-and-greets or a premium brunch experience surrounded by alpacas.',
-    image: img('iris-lodge-hero'),
-    gallery: [img('alpaca-1'), img('alpaca-2'), img('alpaca-3'), img('alpaca-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Sat – Sun', hours: 'Breakfast 8:30 AM (booking required)' },
+      { day: 'Every day', hours: 'Farm Visit 3:00 PM (booking required)' },
+    ],
     phone: '0467 950 470',
     address: '33 Dunks Ln, Jilliby',
+    minutesFromHotel: 17,
+    website: 'https://www.irislodgealpacas.com',
+    email: 'irislodgealpacas@gmail.com',
+    lat: -33.2615283,
+    lng: 151.3771377,
   },
   {
     id: 'treetops-adventure',
@@ -358,11 +443,17 @@ export const thingsToDo: Business[] = [
     tagline: 'Adrenaline-fuelled fun for all ages.',
     description:
       "One of the region's standout attractions, nestled within the Ourimbah State Forest. The park offers a range of aerial rope courses, suspended bridges, monkey bars and ziplines, including New South Wales' longest zipcoaster at 500 metres. Visitors can also bounce through NetWorld, an elevated trampoline playground with large inflatables.",
-    image: img('treetops-hero'),
-    gallery: [img('treetops-1'), img('treetops-2'), img('treetops-3'), img('treetops-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Mon – Fri', hours: '10:00 AM – 5:00 PM' },
+      { day: 'Sat – Sun', hours: '9:00 AM – 5:00 PM' },
+    ],
     phone: '(02) 4307 4905',
     address: '1 Red Hill Rd, Wyong Creek',
+    minutesFromHotel: 20,
+    website: 'https://treetopsadventure.com.au/location/nsw-central-coast/',
+    email: 'centralcoast@treetopsadventure.com.au',
+    lat: -33.2899374,
+    lng: 151.3291669,
   },
   {
     id: 'battlekart-tuggerah',
@@ -374,11 +465,17 @@ export const thingsToDo: Business[] = [
     tagline: 'Go-karting with augmented reality challenges.',
     description:
       'Experience go-karting like never before, with augmented reality and interactive video game challenges.',
-    image: img('battlekart-hero'),
-    gallery: [img('battlekart-1'), img('battlekart-2'), img('battlekart-3'), img('battlekart-4')],
-    hours: callAhead,
+    hours: [
+      { day: 'Mon – Fri', hours: '12:00 PM – 8:00 PM' },
+      { day: 'Sat – Sun', hours: '10:00 AM – 8:00 PM' },
+    ],
     phone: '0428 201 565',
-    address: '8/186 Pacific Hwy, Tuggerah',
+    address: '184-186 Pacific Hwy, Tuggerah',
+    minutesFromHotel: 11,
+    website: 'https://www.battlekart.com/en/tuggerah',
+    email: 'info@tuggerah.battlekart.com',
+    lat: -33.3052094,
+    lng: 151.4202704,
   },
   {
     id: 'ken-duncan-gallery',
@@ -388,13 +485,15 @@ export const thingsToDo: Business[] = [
     location: 'Nearby',
     distanceKm: 20,
     tagline: 'Breathtaking landscape photography by Ken Duncan.',
-    description:
-      'Discover the breathtaking work of renowned Australian landscape photographer Ken Duncan.',
-    image: img('ken-duncan-hero'),
-    gallery: [img('ken-duncan-1'), img('ken-duncan-2'), img('ken-duncan-3'), img('ken-duncan-4')],
-    hours: callAhead,
+    description: 'Discover the breathtaking work of renowned Australian landscape photographer Ken Duncan.',
+    hours: [{ day: 'Every day', hours: '9:00 AM – 4:00 PM' }],
     phone: '(02) 4367 6701',
     address: '414 The Entrance Rd, Erina Heights',
+    minutesFromHotel: 31,
+    website: 'https://kenduncan.com',
+    email: 'erina@kenduncan.com',
+    lat: -33.4257228,
+    lng: 151.4069208,
   },
   {
     id: 'central-coast-aero-club',
@@ -406,15 +505,22 @@ export const thingsToDo: Business[] = [
     tagline: 'See the hotel from above on a scenic flight.',
     description:
       'See the hotel from above and take in the beauty of the coast with a scenic flight from the Central Coast Aero Club. Departing from Warnervale Airport, with sunrise joyflights and guided lessons.',
-    image: img('aero-club-hero'),
-    gallery: [img('aero-1'), img('aero-2'), img('aero-3'), img('aero-4')],
-    hours: callAhead,
+    hours: [{ day: 'Every day', hours: '7:30 AM – 4:30 PM' }],
     phone: '(02) 4392 5174',
     address: '25 Jack Grant Ave, Warnervale',
+    minutesFromHotel: 10,
+    website: 'https://ccac.com.au',
+    email: 'contact@ccac.com.au',
+    lat: -33.2390652,
+    lng: 151.4334583,
   },
 ];
 
+export const eatAndDrink: Business[] = eatAndDrinkBase.map((b) => withImages(b, eatAndDrinkImages));
+export const thingsToDo: Business[] = thingsToDoBase.map((b) => withImages(b, thingsToDoImages));
+
 export const allBusinesses: Business[] = [...eatAndDrink, ...thingsToDo];
 
-export const getBusinessById = (id: string) =>
-  allBusinesses.find((b) => b.id === id);
+export const getBusinessById = (id: string) => allBusinesses.find((b) => b.id === id);
+
+export { responsiveSrcSet } from './media';

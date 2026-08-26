@@ -4,18 +4,19 @@ import { responsiveSrcSet } from '../data/businesses';
 
 export default function HotelInformation() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#edd9ca]">
       <NavBar theme="dark" sticky title="Hotel Information" />
 
       <div className="mx-auto max-w-2xl px-6 py-10 sm:px-10 sm:py-14">
         <div className="mb-10 aspect-[3/2] overflow-hidden rounded-xl bg-neutral-100">
           <img
-            src={heroImage}
-            srcSet={responsiveSrcSet(heroImage, [480, 672, 960, 1344])}
+            src={heroImage.url}
+            srcSet={responsiveSrcSet(heroImage.url, [480, 672, 960, 1344])}
             sizes="(min-width: 700px) 640px, 100vw"
             alt="The Beachcomber Hotel and Resort"
             fetchPriority="high"
             decoding="async"
+            style={{ objectPosition: heroImage.position }}
             className="h-full w-full object-cover"
             draggable={false}
           />

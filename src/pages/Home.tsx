@@ -1,12 +1,11 @@
 import NavBar from '../components/NavBar';
 import VideoBackground from '../components/VideoBackground';
-
-const HOME_VIDEO_SRC = 'https://res.cloudinary.com/q4tmczid/video/upload/v1787028851/bchrbg-3.mp4';
+import { HOME_HERO_VIDEO_URL } from '../data/media';
 
 export default function Home() {
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-black">
-      <VideoBackground src={HOME_VIDEO_SRC} />
+      <VideoBackground src={HOME_HERO_VIDEO_URL} />
 
       <div
         className="absolute inset-0"

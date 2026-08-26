@@ -1,3 +1,5 @@
+import { HOTEL_INFO_HERO_IMAGE_URL, resolveImage } from './media';
+
 export interface InfoItem {
   label: string;
   value: string;
@@ -14,7 +16,7 @@ export const infoItems: InfoItem[] = [
   { label: 'Room Service', value: '11:00 AM – 9:00 PM' },
 ];
 
-export const heroImage = 'https://picsum.photos/seed/beachcomber-hotel-info/1200/800';
+export const heroImage = resolveImage(HOTEL_INFO_HERO_IMAGE_URL);
 
 export const contactInfo = {
   phone: '(02) 4317 2845',
@@ -24,4 +26,6 @@ export const contactInfo = {
   websiteLabel: 'beachcomberhotelandresort.com.au',
   instagram: 'https://instagram.com/thebeachie',
   facebook: 'https://facebook.com/thebeachie',
+  lat: -33.2631224,
+  lng: 151.535408,
 };

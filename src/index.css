@@ -36,6 +36,39 @@ img {
   user-select: none;
 }
 
+/* Neighbourhood Map — MapLibre popup styling to match the app's card language */
+.bch-popup .maplibregl-popup-content {
+  padding: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 16px 32px -12px rgba(0, 0, 0, 0.3);
+  border: none;
+}
+.bch-popup .maplibregl-popup-tip {
+  border-top-color: #fff;
+}
+.bch-popup .maplibregl-popup-close-button {
+  right: 6px;
+  top: 6px;
+  width: 20px;
+  height: 20px;
+  font-size: 15px;
+  color: #a3a3a3;
+  border-radius: 9999px;
+}
+.bch-popup .maplibregl-popup-close-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
+}
+.maplibregl-ctrl-top-right {
+  top: env(safe-area-inset-top, 0px);
+}
+.maplibregl-ctrl-group {
+  border-radius: 10px !important;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.2) !important;
+  overflow: hidden;
+}
+
 /* Thin, unobtrusive scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

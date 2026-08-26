@@ -6,4 +6,5 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   base: '/beachcomber-hotel-and-resort/',
   plugins: [react(), tailwindcss()],
+  optimizeDeps: { exclude: ['maplibre-gl'] },
 })

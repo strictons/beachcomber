@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import logo from '../assets/beachcomber-logo.png';
+import { LOGO_URL } from '../data/media';
 
 const COVER_BLUE = '#567791';
 
@@ -16,8 +16,8 @@ export default function Logo({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
           style={{
             aspectRatio: '807 / 100',
             backgroundColor: COVER_BLUE,
-            WebkitMaskImage: `url(${logo})`,
-            maskImage: `url(${logo})`,
+            WebkitMaskImage: `url(${LOGO_URL})`,
+            maskImage: `url(${LOGO_URL})`,
             WebkitMaskRepeat: 'no-repeat',
             maskRepeat: 'no-repeat',
             WebkitMaskSize: 'contain',
@@ -28,7 +28,7 @@ export default function Logo({ theme = 'dark' }: { theme?: 'light' | 'dark' }) {
         />
       ) : (
         <img
-          src={logo}
+          src={LOGO_URL}
           alt="The Beachcomber Hotel and Resort"
           className={`w-auto ${sizeClass}`}
           fetchPriority="high"

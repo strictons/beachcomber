@@ -4,6 +4,7 @@ export default function Hero({
   image,
   srcSet,
   sizes = '100vw',
+  objectPosition = 'center top',
   heightClass = 'h-[46vh] min-h-[320px]',
   children,
   overlay = 'linear-gradient(to bottom, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.05) 30%, rgba(0,0,0,0.15) 70%, rgba(0,0,0,0.55) 100%)',
@@ -11,6 +12,8 @@ export default function Hero({
   image: string;
   srcSet?: string;
   sizes?: string;
+  /** CSS object-position value controlling which part of the photo stays visible when cropped. */
+  objectPosition?: string;
   heightClass?: string;
   children?: ReactNode;
   overlay?: string;
@@ -24,6 +27,7 @@ export default function Hero({
         alt=""
         fetchPriority="high"
         decoding="async"
+        style={{ objectPosition }}
         className="absolute inset-0 h-full w-full object-cover"
         draggable={false}
       />

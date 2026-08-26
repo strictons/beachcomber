@@ -7,6 +7,8 @@ export default function ThingsToDo() {
       title="Things To Do"
       businesses={thingsToDo}
       basePath="/things-to-do"
+      twoColumnInHotel
+      fullWidthInHotelIds={['live-entertainment', 'saturday-yoga']}
     />
   );
 }
