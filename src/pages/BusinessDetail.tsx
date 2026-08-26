@@ -224,6 +224,27 @@ export default function BusinessDetail() {
             <RoomServiceNote />
           </div>
         )}
+        {business.id === 'saturday-yoga' && (
+          <div className="mt-8">
+            {/*
+              Classes are paused for now — the link stays in the markup
+              (rather than a plain button) so re-enabling later is just
+              deleting aria-disabled/tabIndex/pointer-events-none and
+              restyling to match the active "Book a Table" pill.
+            */}
+            <a
+              href="https://thebeachcomberhotelresort.setmore.com/#services"
+              aria-disabled="true"
+              tabIndex={-1}
+              className="pointer-events-none block cursor-not-allowed select-none rounded-xl bg-neutral-200 px-5 py-3.5 text-center font-heading text-[12px] font-medium uppercase tracking-[0.1em] text-neutral-400"
+            >
+              Book a Class
+            </a>
+            <p className="mt-3 text-center text-[13px] text-neutral-500">
+              Classes are temporarily paused — please check back soon.
+            </p>
+          </div>
+        )}
 
         <div className="mt-10 rounded-2xl border border-neutral-100 bg-neutral-50/60 px-6 py-6 sm:px-8 sm:py-7">
           <h3 className="font-heading text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
