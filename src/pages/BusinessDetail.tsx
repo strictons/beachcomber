@@ -1,5 +1,5 @@
-import { useParams, Navigate, Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
 import Hero from '../components/Hero';
 import NavBar from '../components/NavBar';
 import GalleryLightbox from '../components/GalleryLightbox';
@@ -8,8 +8,19 @@ import BusinessLocationMap from '../components/BusinessLocationMap';
 import WhatsOnSection from '../components/WhatsOnSection';
 import MenuAndBooking from '../components/MenuAndBooking';
 import RoomServiceNote from '../components/RoomServiceNote';
-import { getBusinessById, responsiveSrcSet, todaysHours, formatWebsiteLabel } from '../data/businesses';
+import {
+  getBusinessById,
+  responsiveSrcSet,
+  todaysHours,
+  formatWebsiteLabel,
+  eatAndDrink,
+  thingsToDo,
+} from '../data/businesses';
 import { contactInfo } from '../data/hotelInfo';
+
+/** Swipe must be this far, and this much more horizontal than vertical, to count as a page-to-page swipe. */
+const SWIPE_DISTANCE_THRESHOLD = 60;
+const SWIPE_DIRECTION_RATIO = 1.5;
 
 function PhoneIcon() {
   return (
@@ -70,9 +81,11 @@ function MailIcon() {
 
 export default function BusinessDetail() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const business = id ? getBusinessById(id) : undefined;
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [scrolled, setScrolled] = useState(false);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
 
   useEffect(() => {
     function onScroll() {
@@ -81,6 +94,10 @@ export default function BusinessDetail() {
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
+  }, [id]);
+
+  useEffect(() => {
+    setLightboxIndex(null);
   }, [id]);
 
   if (!business) return <Navigate to="/" replace />;
@@ -95,8 +112,42 @@ export default function BusinessDetail() {
   const driveTimeLabel = isNearby ? `${business.minutesFromHotel} Min Drive` : 'On-Site';
   const todays = todaysHours(business);
 
+  // Swipe left/right moves between businesses within the same category
+  // (Eat & Drink or Things To Do), in the same order they're listed on that
+  // category's page.
+  const categoryList = business.type === 'eat-drink' ? eatAndDrink : thingsToDo;
+  const categoryIndex = categoryList.findIndex((b) => b.id === business.id);
+  const prevBusiness = categoryIndex > 0 ? categoryList[categoryIndex - 1] : null;
+  const nextBusiness = categoryIndex < categoryList.length - 1 ? categoryList[categoryIndex + 1] : null;
+
+  function handleTouchStart(e: React.TouchEvent) {
+    // Swiping open the photo lightbox or panning the embedded map has its
+    // own, more specific gesture handling — don't fight it for the touch.
+    if (lightboxIndex !== null) return;
+    if ((e.target as HTMLElement).closest('.maplibregl-map')) return;
+    const t = e.touches[0];
+    touchStart.current = { x: t.clientX, y: t.clientY };
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - start.x;
+    const dy = t.clientY - start.y;
+    if (Math.abs(dx) < SWIPE_DISTANCE_THRESHOLD || Math.abs(dx) < Math.abs(dy) * SWIPE_DIRECTION_RATIO) return;
+
+    const target = dx < 0 ? nextBusiness : prevBusiness;
+    if (target) navigate(`${basePath}/${target.id}`);
+  }
+
   return (
-    <div className={`min-h-screen pb-20 ${isNearby ? 'bg-white' : 'bg-[#edd9ca]'}`}>
+    <div
+      className={`min-h-screen pb-20 ${isNearby ? 'bg-white' : 'bg-[#edd9ca]'}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
       <Hero
         image={business.image.url}
         srcSet={responsiveSrcSet(business.image.url, [640, 960, 1280, 1600], business.image.upscale)}
