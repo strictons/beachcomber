@@ -4,5 +4,11 @@
     { "source": "/beachcomber-hotel-and-resort/favicon.png", "destination": "/favicon.png" },
     { "source": "/beachcomber-hotel-and-resort", "destination": "/index.html" },
     { "source": "/beachcomber-hotel-and-resort/:path*", "destination": "/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow, noarchive, nosnippet, noimageindex" }]
+    }
   ]
 }
