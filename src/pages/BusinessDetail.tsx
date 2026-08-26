@@ -155,14 +155,57 @@ export default function BusinessDetail() {
         heightClass="h-[52vh] min-h-[360px]"
       >
         <NavBar theme="light" variant="back" backTo={basePath} title={sectionTitle} scrolled={scrolled} />
-        <div className="absolute inset-x-0 bottom-8 px-6 sm:px-10">
-          <p className="flex items-center gap-1.5 text-[11px] font-light uppercase tracking-[0.25em] text-white/70">
-            {isNearby && <CarIcon />}
-            {driveTimeLabel}
-          </p>
-          <h1 className="mt-2 font-display text-[30px] text-white sm:text-[42px]">
-            {business.name}
-          </h1>
+        <div className="absolute inset-x-0 bottom-8 flex items-end justify-between gap-4 px-6 sm:px-10">
+          <div className="min-w-0">
+            <p className="flex items-center gap-1.5 text-[11px] font-light uppercase tracking-[0.25em] text-white/70">
+              {isNearby && <CarIcon />}
+              {driveTimeLabel}
+            </p>
+            <h1 className="mt-2 font-display text-[30px] text-white sm:text-[42px]">
+              {business.name}
+            </h1>
+          </div>
+
+          {categoryList.length > 1 && (
+            <div className="flex shrink-0 items-center gap-2">
+              <button
+                onClick={() => prevBusiness && navigate(`${basePath}/${prevBusiness.id}`)}
+                disabled={!prevBusiness}
+                aria-label={`Previous ${sectionTitle} business`}
+                className={`flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white backdrop-blur-sm transition-colors ${
+                  prevBusiness ? 'cursor-pointer hover:bg-white/25' : 'cursor-default opacity-30'
+                }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M15 18L9 12L15 6"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={() => nextBusiness && navigate(`${basePath}/${nextBusiness.id}`)}
+                disabled={!nextBusiness}
+                aria-label={`Next ${sectionTitle} business`}
+                className={`flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/10 text-white backdrop-blur-sm transition-colors ${
+                  nextBusiness ? 'cursor-pointer hover:bg-white/25' : 'cursor-default opacity-30'
+                }`}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M9 6L15 12L9 18"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
         </div>
       </Hero>
 
