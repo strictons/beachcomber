@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { MenuProvider } from './components/MenuContext';
 import MenuOverlay from './components/MenuOverlay';
+import ScanAnotherButton from './components/ScanAnotherButton';
 import Home from './pages/Home';
 import EatAndDrink from './pages/EatAndDrink';
 import ThingsToDo from './pages/ThingsToDo';
@@ -64,6 +65,7 @@ export default function App() {
           <Route path="/map" element={<NeighbourhoodMap />} />
         </Routes>
         <MenuOverlay />
+        <ScanAnotherButton />
       </MenuProvider>
     </BrowserRouter>
   );
