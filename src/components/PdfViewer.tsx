@@ -120,24 +120,44 @@ export default function PdfViewer({ src }: { src: string }) {
   return (
     <div className="relative">
       {status === 'ready' && (
-        <div className="mb-2 flex items-center justify-end gap-1.5">
-          <button
-            onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))}
-            disabled={zoom <= MIN_ZOOM}
-            aria-label="Zoom out"
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-neutral-100"
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <a
+            href={src}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 rounded-full bg-neutral-100 px-3.5 py-1.5 font-heading text-[11px] font-medium uppercase tracking-[0.08em] text-neutral-500 transition-colors hover:bg-neutral-200"
           >
-            <ZoomIcon out />
-          </button>
-          <span className="w-10 text-center font-heading text-[11px] font-medium text-neutral-400">{zoom}%</span>
-          <button
-            onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))}
-            disabled={zoom >= MAX_ZOOM}
-            aria-label="Zoom in"
-            className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-neutral-100"
-          >
-            <ZoomIcon />
-          </button>
+            Open PDF in Browser
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M7 17L17 7M17 7H8M17 7V16"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </a>
+
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))}
+              disabled={zoom <= MIN_ZOOM}
+              aria-label="Zoom out"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-neutral-100"
+            >
+              <ZoomIcon out />
+            </button>
+            <span className="w-10 text-center font-heading text-[11px] font-medium text-neutral-400">{zoom}%</span>
+            <button
+              onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))}
+              disabled={zoom >= MAX_ZOOM}
+              aria-label="Zoom in"
+              className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-neutral-100"
+            >
+              <ZoomIcon />
+            </button>
+          </div>
         </div>
       )}
 
