@@ -82,7 +82,7 @@ export default function BusinessMenu() {
       </div>
 
       <div className="px-4 py-6 sm:px-10 sm:py-10">
-        <div className="overflow-hidden rounded-2xl bg-white p-2 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:p-4">
+        <div className="rounded-2xl bg-white p-2 shadow-[0_1px_2px_rgba(0,0,0,0.04)] sm:p-4">
           <PdfViewer key={pdfUrl} src={pdfUrl} />
         </div>
 
