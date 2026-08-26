@@ -1,5 +1,9 @@
-import { useRef } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useMenu } from './MenuContext';
+
+// Pulls in jsQR, so it's kept out of the main bundle and only fetched by
+// guests who actually tap the button.
+const QrScannerModal = lazy(() => import('./QrScannerModal'));
 
 function QrIcon() {
   return (
@@ -16,34 +20,18 @@ function QrIcon() {
 }
 
 /**
- * Floating shortcut back into the device camera for a guest who's just
- * scanned this guide's QR code and wants to scan a different one (another
- * area of the property, another business) without hunting for the camera
- * app themselves. There's no cross-browser API to launch the camera app
- * directly — a `capture` file input is the standard web mechanism, and it
- * opens the same native camera view (with the OS's own live QR detection)
- * as tapping the camera app icon would.
+ * Floating shortcut for a guest who's just scanned this guide's QR code and
+ * wants to scan a different one (another area of the property, another
+ * business) without hunting for a scanning app themselves.
  */
 export default function ScanAnotherButton() {
-  const inputRef = useRef<HTMLInputElement>(null);
   const { isOpen: menuOpen } = useMenu();
+  const [scannerOpen, setScannerOpen] = useState(false);
 
   return (
     <>
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        capture="environment"
-        className="hidden"
-        onChange={() => {
-          // Nothing to do with the captured photo itself — the point is
-          // just getting the OS's own QR detection in front of the guest.
-          if (inputRef.current) inputRef.current.value = '';
-        }}
-      />
       <button
-        onClick={() => inputRef.current?.click()}
+        onClick={() => setScannerOpen(true)}
         aria-label="Scan another QR code"
         className={`fixed left-4 z-40 flex cursor-pointer flex-col items-center gap-1.5 transition-opacity duration-300 ${
           menuOpen ? 'pointer-events-none opacity-0' : 'opacity-100'
@@ -57,6 +45,12 @@ export default function ScanAnotherButton() {
           Scan Another
         </span>
       </button>
+
+      {scannerOpen && (
+        <Suspense fallback={<div className="fixed inset-0 z-50 bg-black" />}>
+          <QrScannerModal onClose={() => setScannerOpen(false)} />
+        </Suspense>
+      )}
     </>
   );
 }
