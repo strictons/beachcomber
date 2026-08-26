@@ -50,16 +50,16 @@ export default function HotelInformation() {
           </p>
           <p className="mt-1 text-[13px] text-neutral-400">{contactInfo.address}</p>
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[13px] text-neutral-400">
+          <div className="mt-6 flex flex-col items-center gap-2 text-[13px] text-neutral-400 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-x-5 sm:gap-y-2">
             <a
               href={contactInfo.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#1d1d1f] hover:underline"
+              className="break-all hover:text-[#1d1d1f] hover:underline"
             >
               {contactInfo.websiteLabel}
             </a>
-            <a href={`mailto:${contactInfo.email}`} className="hover:text-[#1d1d1f] hover:underline">
+            <a href={`mailto:${contactInfo.email}`} className="break-all hover:text-[#1d1d1f] hover:underline">
               {contactInfo.email}
             </a>
             <a

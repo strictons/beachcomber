@@ -52,7 +52,7 @@ function PinIcon() {
 
 function GlobeIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0 text-neutral-400">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="mt-0.5 shrink-0 text-neutral-400">
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
       <path d="M3 12h18" stroke="currentColor" strokeWidth="1.5" />
       <path
@@ -66,7 +66,7 @@ function GlobeIcon() {
 
 function MailIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0 text-neutral-400">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="mt-0.5 shrink-0 text-neutral-400">
       <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
       <path
         d="M4 7l8 6 8-6"
@@ -278,7 +278,7 @@ export default function BusinessDetail() {
                   href={business.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
+                  className="flex items-start gap-2.5 break-all text-[14px] font-medium text-[#1d1d1f] hover:underline"
                 >
                   <GlobeIcon />
                   {formatWebsiteLabel(business.website)}
@@ -287,7 +287,7 @@ export default function BusinessDetail() {
               {business.email && (
                 <a
                   href={`mailto:${business.email}`}
-                  className="flex items-center gap-2.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
+                  className="flex items-start gap-2.5 break-all text-[14px] font-medium text-[#1d1d1f] hover:underline"
                 >
                   <MailIcon />
                   {business.email}
