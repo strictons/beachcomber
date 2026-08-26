@@ -238,6 +238,13 @@ export default function NeighbourhoodMap() {
 
     const resizeObserver = new ResizeObserver(() => m.resize());
     resizeObserver.observe(mapContainer.current);
+    // Some browsers don't reliably fire ResizeObserver for every layout
+    // change (e.g. this page's `100dvh` container resizing as a mobile
+    // browser's address bar shows/hides on scroll), which can leave the
+    // canvas stuck at a stale size — resize on these too as a fallback.
+    const handleWindowResize = () => m.resize();
+    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener('orientationchange', handleWindowResize);
 
     const hotelEl = createPinElement(HOTEL_COLOR, 'hotel', 38);
     const hotelMarker = new Marker({ element: hotelEl, anchor: 'bottom' })
@@ -257,6 +264,8 @@ export default function NeighbourhoodMap() {
 
     return () => {
       resizeObserver.disconnect();
+      window.removeEventListener('resize', handleWindowResize);
+      window.removeEventListener('orientationchange', handleWindowResize);
       deferredUnmount(hotelPopupRoot);
       m.remove();
       map.current = null;

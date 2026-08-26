@@ -67,6 +67,13 @@ export default function BusinessLocationMap({ business }: { business: Business &
 
     const resizeObserver = new ResizeObserver(() => m.resize());
     resizeObserver.observe(mapContainer.current);
+    // Some browsers don't reliably fire ResizeObserver for every layout
+    // change (e.g. a container resized only via a viewport/orientation
+    // change), which can leave the canvas stuck at a stale size — resize on
+    // these too as a fallback so it can't get permanently out of sync.
+    const handleWindowResize = () => m.resize();
+    window.addEventListener('resize', handleWindowResize);
+    window.addEventListener('orientationchange', handleWindowResize);
 
     const popupRoots: Root[] = [];
 
@@ -109,6 +116,8 @@ export default function BusinessLocationMap({ business }: { business: Business &
 
     return () => {
       resizeObserver.disconnect();
+      window.removeEventListener('resize', handleWindowResize);
+      window.removeEventListener('orientationchange', handleWindowResize);
       popupRoots.forEach(deferredUnmount);
       m.remove();
       map.current = null;
