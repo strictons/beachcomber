@@ -55,15 +55,22 @@ function ZoomIcon({ out = false }: { out?: boolean }) {
  * full-width, scrollable result everywhere.
  *
  * Pages are oversampled well past what a 100%-zoom display needs, and zoom
- * is applied by widening the rendered content inside a horizontally
- * scrollable strip — so "zoom in" is a real resolution increase (crisp up to
- * MAX_ZOOM), not a CSS stretch of the same pixels, and panning is just the
- * browser's native touch/drag scroll rather than custom gesture code.
+ * is applied by widening the rendered content inside a scrollable strip whose
+ * own height is locked to its 100%-zoom size — so "zoom in" is a real
+ * resolution increase (crisp up to MAX_ZOOM) that the guest pans around
+ * inside a card that doesn't itself grow, rather than a CSS stretch that
+ * makes the whole page taller. Panning is just the browser's native
+ * touch/drag scroll, not custom gesture code.
  */
 export default function PdfViewer({ src }: { src: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState<Status>('loading');
   const [zoom, setZoom] = useState(MIN_ZOOM);
+  // Measured once at the 100%-zoom render, then locked in — so the card's
+  // on-screen footprint stays put as the guest zooms; only the PDF inside it
+  // grows and becomes pannable, rather than the whole page growing taller.
+  const [baseHeight, setBaseHeight] = useState<number | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -71,6 +78,7 @@ export default function PdfViewer({ src }: { src: string }) {
 
     let cancelled = false;
     setStatus('loading');
+    setBaseHeight(null);
     container.replaceChildren();
 
     async function render() {
@@ -104,7 +112,10 @@ export default function PdfViewer({ src }: { src: string }) {
           await page.render({ canvas, viewport }).promise;
         }
 
-        if (!cancelled) setStatus('ready');
+        if (!cancelled) {
+          setBaseHeight(container!.scrollHeight);
+          setStatus('ready');
+        }
       } catch (err) {
         console.error('Failed to render PDF', err);
         if (!cancelled) setStatus('error');
@@ -116,6 +127,15 @@ export default function PdfViewer({ src }: { src: string }) {
       cancelled = true;
     };
   }, [src]);
+
+  function setZoomAndResetScroll(updater: (current: number) => number) {
+    setZoom(updater);
+    const scrollEl = scrollRef.current;
+    if (scrollEl) {
+      scrollEl.scrollLeft = 0;
+      scrollEl.scrollTop = 0;
+    }
+  }
 
   return (
     <div className="relative">
@@ -141,7 +161,7 @@ export default function PdfViewer({ src }: { src: string }) {
 
           <div className="flex shrink-0 items-center gap-1.5">
             <button
-              onClick={() => setZoom((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))}
+              onClick={() => setZoomAndResetScroll((z) => Math.max(MIN_ZOOM, z - ZOOM_STEP))}
               disabled={zoom <= MIN_ZOOM}
               aria-label="Zoom out"
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-neutral-100"
@@ -150,7 +170,7 @@ export default function PdfViewer({ src }: { src: string }) {
             </button>
             <span className="w-10 text-center font-heading text-[11px] font-medium text-neutral-400">{zoom}%</span>
             <button
-              onClick={() => setZoom((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))}
+              onClick={() => setZoomAndResetScroll((z) => Math.min(MAX_ZOOM, z + ZOOM_STEP))}
               disabled={zoom >= MAX_ZOOM}
               aria-label="Zoom in"
               className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-neutral-100 text-neutral-500 transition-colors hover:bg-neutral-200 disabled:cursor-default disabled:opacity-30 disabled:hover:bg-neutral-100"
@@ -161,7 +181,11 @@ export default function PdfViewer({ src }: { src: string }) {
         </div>
       )}
 
-      <div className="overflow-x-auto overflow-y-visible">
+      <div
+        ref={scrollRef}
+        className="overflow-auto"
+        style={baseHeight ? { height: baseHeight } : undefined}
+      >
         {/* Kept in normal flow (never display:none) so its width is measurable
             while rendering, and so the finished card hugs the page images'
             actual height instead of stretching to fill its container. */}

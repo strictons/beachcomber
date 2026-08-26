@@ -32,7 +32,7 @@ export default function BusinessMenu() {
 
   return (
     <div className="min-h-screen bg-[#edd9ca]">
-      <NavBar theme="dark" sticky variant="back" backTo={`/eat-drink/${business.id}`} />
+      <NavBar theme="dark" sticky variant="back" backTo={`/eat-drink/${business.id}`} title={business.name} />
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-black/5 bg-[#edd9ca] px-6 py-3 sm:px-10">
         <div className="min-w-0">
