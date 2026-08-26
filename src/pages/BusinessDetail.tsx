@@ -1,4 +1,4 @@
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, Navigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Hero from '../components/Hero';
 import NavBar from '../components/NavBar';
@@ -270,6 +270,15 @@ export default function BusinessDetail() {
             </div>
           </div>
         )}
+
+        <div className="mt-14 border-t border-black/5 pt-8 text-center">
+          <Link
+            to="/"
+            className="font-heading text-[11px] font-medium uppercase tracking-[0.15em] text-[#1d1d1f]/40 transition-colors hover:text-[#1d1d1f]"
+          >
+            Part of The Beachcomber Hotel &amp; Resort Guide
+          </Link>
+        </div>
       </div>
 
       {lightboxIndex !== null && (

@@ -42,7 +42,7 @@ export default function ScanAnotherButton() {
           <QrIcon />
         </span>
         <span className="rounded-full bg-[#1d1d1f]/90 px-2.5 py-1 font-heading text-[9px] font-medium uppercase tracking-[0.1em] text-white shadow-[0_4px_10px_-2px_rgba(0,0,0,0.35)] backdrop-blur-sm">
-          Scan Another
+          QR Scan
         </span>
       </button>
 
