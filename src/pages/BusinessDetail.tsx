@@ -274,9 +274,18 @@ export default function BusinessDetail() {
         <div className="mt-14 border-t border-black/5 pt-8 text-center">
           <Link
             to="/"
-            className="font-heading text-[11px] font-medium uppercase tracking-[0.15em] text-[#1d1d1f]/40 transition-colors hover:text-[#1d1d1f]"
+            className="inline-flex items-center gap-1.5 font-heading text-[11px] font-medium uppercase tracking-[0.15em] text-[#1d1d1f]/40 underline decoration-[#1d1d1f]/20 underline-offset-4 transition-colors hover:text-[#1d1d1f] hover:decoration-[#1d1d1f]/50"
           >
             Part of The Beachcomber Hotel &amp; Resort Guide
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M7 17L17 7M17 7H8M17 7V16"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
           </Link>
         </div>
       </div>
