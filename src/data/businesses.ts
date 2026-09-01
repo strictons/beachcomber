@@ -39,6 +39,10 @@ export interface Business {
   minutesFromHotel?: number;
   website?: string;
   email?: string;
+  /** Instagram handle without the leading "@", e.g. "bbsoulkitchen". */
+  instagram?: string;
+  /** Full Facebook page URL. */
+  facebook?: string;
   /** Coordinates for the Neighbourhood Map. Only set for Nearby businesses. */
   lat?: number;
   lng?: number;
@@ -145,6 +149,8 @@ const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 2,
     website: 'https://www.bbsoulkitchen.com.au/',
     email: 'contact@bbsoulkitchen.com.au',
+    instagram: 'bbsoulkitchen',
+    facebook: 'https://www.facebook.com/bbsoulkitchen',
     lat: -33.26405,
     lng: 151.5407,
   },
@@ -169,6 +175,8 @@ const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 7,
     website: 'https://www.johnnytapas.com.au/',
     email: 'bookings@johnnytapas.com.au',
+    instagram: 'johnnytapas',
+    facebook: 'https://www.facebook.com/p/Johnny-Tapas-100063485621533',
     lat: -33.2793851,
     lng: 151.5651967,
   },
@@ -192,6 +200,8 @@ const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 13,
     website: 'https://www.motelmezza.com.au/',
     email: 'enjoy@motelmezza.com.au',
+    instagram: 'motel_mezza',
+    facebook: 'https://www.facebook.com/motelmezza',
     lat: -33.2846912,
     lng: 151.4246124,
   },
@@ -218,6 +228,8 @@ const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 13,
     website: 'https://www.wyongmilkfactory.com.au/',
     email: 'info@wyongmilkfactory.com.au',
+    instagram: 'wyongmilkfactory',
+    facebook: 'https://www.facebook.com/wyongmilkfactorytavern',
     lat: -33.279172,
     lng: 151.4174592,
   },
@@ -243,6 +255,8 @@ const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 2,
     website: 'https://www.mexicoastcantina.com/',
     email: 'admin@mexicoastcantina.com',
+    instagram: 'mexicoastcantina',
+    facebook: 'https://www.facebook.com/mexicoast1',
     lat: -33.26415,
     lng: 151.5406,
   },
@@ -265,6 +279,8 @@ const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 15,
     website: 'https://www.cueandcrew.com/',
     email: 'manager.cueandcrew@gmail.com',
+    instagram: 'cueandcrew',
+    facebook: 'https://www.facebook.com/CueandCrew',
     lat: -33.3134573,
     lng: 151.4216281,
   },
@@ -284,6 +300,8 @@ const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 15,
     website: 'https://www.thesavoybarandmusic.com.au/',
     email: 'welcome@thesavoybarandmusic.com.au',
+    instagram: 'thesavoybarandmusic',
+    facebook: 'https://www.facebook.com/thesavoybarandmusic',
     lat: -33.3653702,
     lng: 151.4766742,
   },
@@ -368,6 +386,8 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 30,
     website: 'https://www.reptilepark.com.au',
     email: 'admin@reptilepark.com.au',
+    instagram: 'australianreptilepark',
+    facebook: 'https://www.facebook.com/AustralianReptilePark',
     lat: -33.4193524,
     lng: 151.2860216,
   },
@@ -390,6 +410,8 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 38,
     website: 'https://brokenbaypearlfarm.com.au',
     email: 'hello@brokenbaypearlfarm.com.au',
+    instagram: 'brokenbaypearlfarm',
+    facebook: 'https://www.facebook.com/brokenbaypearlfarm',
     lat: -33.5267055,
     lng: 151.2011883,
   },
@@ -408,6 +430,8 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 20,
     website: 'https://chocolatefactorygosford.com.au',
     email: 'info@chocolatefactorygosford.com.au',
+    instagram: 'chocolatefactorygosford',
+    facebook: 'https://www.facebook.com/chocolatefactorygosford',
     lat: -33.4297807,
     lng: 151.3132326,
   },
@@ -430,6 +454,8 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 17,
     website: 'https://www.irislodgealpacas.com',
     email: 'irislodgealpacas@gmail.com',
+    instagram: 'irislodgealpacas',
+    facebook: 'https://www.facebook.com/irislodgealpacas',
     lat: -33.2615283,
     lng: 151.3771377,
   },
@@ -452,6 +478,8 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 20,
     website: 'https://treetopsadventure.com.au/location/nsw-central-coast/',
     email: 'centralcoast@treetopsadventure.com.au',
+    instagram: 'treetopsadventureaust',
+    facebook: 'https://www.facebook.com/treetopsadventurecentralcoast',
     lat: -33.2899374,
     lng: 151.3291669,
   },
@@ -474,6 +502,8 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 11,
     website: 'https://www.battlekart.com/en/tuggerah',
     email: 'info@tuggerah.battlekart.com',
+    instagram: 'battlekart_tuggerah',
+    facebook: 'https://www.facebook.com/p/BattleKart-Tuggerah-61566335335715',
     lat: -33.3052094,
     lng: 151.4202704,
   },
@@ -492,6 +522,8 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 31,
     website: 'https://kenduncan.com',
     email: 'erina@kenduncan.com',
+    instagram: 'kenduncangallery',
+    facebook: 'https://www.facebook.com/kenduncangallery',
     lat: -33.4257228,
     lng: 151.4069208,
   },
@@ -511,6 +543,8 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     minutesFromHotel: 10,
     website: 'https://ccac.com.au',
     email: 'contact@ccac.com.au',
+    instagram: 'ccaeroclub',
+    facebook: 'https://www.facebook.com/ccaeroclub',
     lat: -33.2390652,
     lng: 151.4334583,
   },
@@ -523,4 +557,4 @@ export const allBusinesses: Business[] = [...eatAndDrink, ...thingsToDo];
 
 export const getBusinessById = (id: string) => allBusinesses.find((b) => b.id === id);
 
-export { responsiveSrcSet } from './media';
+export { responsiveSrcSet, cldImageUrl } from './media';

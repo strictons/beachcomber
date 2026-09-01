@@ -1,11 +1,18 @@
 import NavBar from '../components/NavBar';
 import VideoBackground from '../components/VideoBackground';
-import { HOME_HERO_VIDEO_URL } from '../data/media';
+import { HOME_HERO_VIDEO_URL, cldVideoUrl, cldVideoPosterUrl } from '../data/media';
+
+// A full-bleed ambient loop — 1280px wide is plenty for any phone or laptop,
+// and the poster still paints before a single video byte arrives.
+const HERO_VIDEO_WIDTH = 1280;
 
 export default function Home() {
   return (
     <div className="relative h-[100dvh] w-full overflow-hidden bg-black">
-      <VideoBackground src={HOME_HERO_VIDEO_URL} />
+      <VideoBackground
+        src={cldVideoUrl(HOME_HERO_VIDEO_URL, HERO_VIDEO_WIDTH)}
+        poster={cldVideoPosterUrl(HOME_HERO_VIDEO_URL, HERO_VIDEO_WIDTH)}
+      />
 
       <div
         className="absolute inset-0"

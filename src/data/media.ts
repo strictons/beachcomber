@@ -264,7 +264,7 @@ export const thingsToDoImages: Record<string, BusinessImages> = {
 
   // Broken Bay Pearl Farm
   'broken-bay-pearl-farm': {
-    hero: { url: 'https://res.cloudinary.com/q4tmczid/image/upload/v1787010533/pearl.tiff', position: 'top' },
+    hero: { url: 'https://res.cloudinary.com/q4tmczid/image/upload/v1788265459/broken-bay-pearl-farm.jpg', position: 'center' },
     gallery: [
       { url: 'https://res.cloudinary.com/q4tmczid/image/upload/v1787721236/pearl-farm1.webp', position: 'top' },
       { url: 'https://res.cloudinary.com/q4tmczid/image/upload/v1787721222/pearl-farm3.webp', position: 'top' },
@@ -335,7 +335,7 @@ export const thingsToDoImages: Record<string, BusinessImages> = {
 
   // Central Coast Aero Club
   'central-coast-aero-club': {
-    hero: { url: 'https://res.cloudinary.com/q4tmczid/image/upload/v1787010026/ccac.tiff', position: 'center left' },
+    hero: { url: 'https://res.cloudinary.com/q4tmczid/image/upload/v1788265652/ccac-hero.jpg', position: 'center left' },
     gallery: [
       { url: 'https://res.cloudinary.com/q4tmczid/image/upload/v1787722301/ccac1.webp', position: 'top' },
       { url: 'https://res.cloudinary.com/q4tmczid/image/upload/v1787722286/ccac2.webp', position: 'top' },
@@ -355,6 +355,61 @@ const PICSUM_URL = /^(.*\/seed\/[^/]+\/)(\d+)\/(\d+)$/;
 // Matches any Cloudinary delivery URL, e.g.
 // https://res.cloudinary.com/<cloud>/image/upload/<optional transforms>/<public_id>
 const CLOUDINARY_URL = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.*)$/;
+const CLOUDINARY_VIDEO_URL = /^(https:\/\/res\.cloudinary\.com\/[^/]+\/video\/upload\/)(.*)$/;
+
+/**
+ * Shared Cloudinary transform segment. Kept byte-for-byte identical to what
+ * `responsiveSrcSet` emits so a `src` built here reuses a `srcSet` variant's
+ * already-generated (CDN-warm) derivative instead of triggering a fresh,
+ * slow on-demand transformation.
+ */
+function cldTransforms(width: number, upscale: boolean): string {
+  return `${upscale ? 'e_upscale/' : ''}w_${width},c_limit,f_auto,q_auto`;
+}
+
+/**
+ * A single, sensibly-sized delivery URL for a plain `<img src>`.
+ *
+ * The raw URLs in this file point at the untouched originals — often a
+ * multi-megabyte `.tiff`/`.png` that no browser can even display inline. The
+ * `srcSet` built by `responsiveSrcSet` covers modern browsers, but the bare
+ * `src` is still the fallback *and* an LCP candidate the browser may fetch
+ * eagerly. Routing every `src` through here caps the width and lets
+ * Cloudinary pick a modern format + quality, so nothing ever downloads the
+ * raw original. No-op for non-Cloudinary URLs (e.g. the bundled logo).
+ */
+export function cldImageUrl(url: string, width: number, upscale = false): string {
+  const match = url.match(CLOUDINARY_URL);
+  if (!match) return url;
+  const [, base, publicId] = match;
+  return `${base}${cldTransforms(width, upscale)}/${publicId}`;
+}
+
+/**
+ * A compressed, width-capped delivery URL for a background `<video src>`.
+ * `f_auto` picks webm/mp4 per browser, `vc_auto` the matching codec,
+ * `q_auto` a sane bitrate. A full-bleed ambient loop never needs the full
+ * source resolution. No-op for non-Cloudinary URLs.
+ */
+export function cldVideoUrl(url: string, width: number): string {
+  const match = url.match(CLOUDINARY_VIDEO_URL);
+  if (!match) return url;
+  const [, base, publicId] = match;
+  return `${base}w_${width},c_limit,f_auto,q_auto,vc_auto/${publicId}`;
+}
+
+/**
+ * A poster still (first frame) for a Cloudinary video, so the hero paints
+ * instantly instead of showing black until the video buffers. No-op for
+ * non-Cloudinary URLs (returns '' so the attribute can be omitted).
+ */
+export function cldVideoPosterUrl(url: string, width: number): string {
+  const match = url.match(CLOUDINARY_VIDEO_URL);
+  if (!match) return '';
+  const [, base, publicId] = match;
+  const asJpg = publicId.replace(/\.(mp4|webm|mov|m4v|ogv)$/i, '');
+  return `${base}so_0,w_${width},c_limit,f_auto,q_auto/${asJpg}.jpg`;
+}
 
 /**
  * Builds a srcSet requesting the same image at several widths, so the browser
@@ -381,8 +436,7 @@ export function responsiveSrcSet(url: string, widths: number[], upscale = false)
   const cloudinaryMatch = url.match(CLOUDINARY_URL);
   if (cloudinaryMatch) {
     const [, base, publicId] = cloudinaryMatch;
-    const upscalePrefix = upscale ? 'e_upscale/' : '';
-    return widths.map((w) => `${base}${upscalePrefix}w_${w},c_limit,f_auto,q_auto/${publicId} ${w}w`).join(', ');
+    return widths.map((w) => `${base}${cldTransforms(w, upscale)}/${publicId} ${w}w`).join(', ');
   }
 
   return undefined;

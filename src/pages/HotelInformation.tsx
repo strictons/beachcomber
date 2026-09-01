@@ -1,8 +1,15 @@
+import { preload } from 'react-dom';
 import NavBar from '../components/NavBar';
 import { infoItems, heroImage, contactInfo } from '../data/hotelInfo';
-import { responsiveSrcSet } from '../data/businesses';
+import { responsiveSrcSet, cldImageUrl } from '../data/businesses';
+
+const HERO_SIZES = '(min-width: 700px) 640px, 100vw';
+const heroSrc = cldImageUrl(heroImage.url, 960);
+const heroSrcSet = responsiveSrcSet(heroImage.url, [480, 672, 960, 1344]);
 
 export default function HotelInformation() {
+  preload(heroSrc, { as: 'image', fetchPriority: 'high', imageSrcSet: heroSrcSet, imageSizes: HERO_SIZES });
+
   return (
     <div className="min-h-screen bg-[#edd9ca]">
       <NavBar theme="dark" sticky title="Hotel Information" mobileTitle="Hotel Info" />
@@ -10,9 +17,9 @@ export default function HotelInformation() {
       <div className="mx-auto max-w-2xl px-6 py-10 sm:px-10 sm:py-14">
         <div className="mb-10 aspect-[3/2] overflow-hidden rounded-xl bg-neutral-100">
           <img
-            src={heroImage.url}
-            srcSet={responsiveSrcSet(heroImage.url, [480, 672, 960, 1344])}
-            sizes="(min-width: 700px) 640px, 100vw"
+            src={heroSrc}
+            srcSet={heroSrcSet}
+            sizes={HERO_SIZES}
             alt="The Beachcomber Hotel and Resort"
             fetchPriority="high"
             decoding="async"

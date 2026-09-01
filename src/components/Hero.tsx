@@ -1,4 +1,9 @@
 import type { ReactNode } from 'react';
+import { preload } from 'react-dom';
+import { cldImageUrl } from '../data/media';
+
+/** Width of the plain-`src` fallback — the srcSet still serves smaller/larger variants. */
+const HERO_FALLBACK_WIDTH = 1280;
 
 export default function Hero({
   image,
@@ -18,10 +23,22 @@ export default function Hero({
   children?: ReactNode;
   overlay?: string;
 }) {
+  const src = cldImageUrl(image, HERO_FALLBACK_WIDTH);
+
+  // Kick the hero download off the moment this renders, rather than waiting
+  // for the <img> to commit to the DOM — this is the page's LCP element.
+  // Matching srcSet/sizes so the browser reuses this fetch for the <img>.
+  preload(src, {
+    as: 'image',
+    fetchPriority: 'high',
+    imageSrcSet: srcSet,
+    imageSizes: srcSet ? sizes : undefined,
+  });
+
   return (
     <div className={`relative w-full overflow-hidden ${heightClass}`}>
       <img
-        src={image}
+        src={src}
         srcSet={srcSet}
         sizes={srcSet ? sizes : undefined}
         alt=""

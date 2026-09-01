@@ -1,5 +1,9 @@
 import { useEffect, useRef } from 'react';
 import { lockScroll, unlockScroll } from '../utils/scrollLock';
+import { cldImageUrl, responsiveSrcSet } from '../data/media';
+
+/** Widths offered to the browser for the full-screen image. */
+const LIGHTBOX_WIDTHS = [640, 1024, 1600];
 
 export default function GalleryLightbox({
   images,
@@ -23,6 +27,16 @@ export default function GalleryLightbox({
     lockScroll();
     return unlockScroll;
   }, []);
+
+  // Warm the neighbouring photos so left/right swipes show instantly.
+  useEffect(() => {
+    if (images.length < 2) return;
+    for (const offset of [1, -1]) {
+      const neighbour = images[(index + offset + images.length) % images.length];
+      const img = new Image();
+      img.src = cldImageUrl(neighbour, 1600);
+    }
+  }, [index, images]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -75,7 +89,9 @@ export default function GalleryLightbox({
       <div className="relative flex flex-1 items-center justify-center px-4 pb-6 sm:px-10">
         <img
           key={images[index]}
-          src={images[index]}
+          src={cldImageUrl(images[index], 1600)}
+          srcSet={responsiveSrcSet(images[index], LIGHTBOX_WIDTHS)}
+          sizes="100vw"
           alt={`${altPrefix} photo ${index + 1}`}
           draggable={false}
           className="max-h-full max-w-full select-none object-contain"

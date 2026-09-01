@@ -1,8 +1,9 @@
-export default function VideoBackground({ src }: { src: string }) {
+export default function VideoBackground({ src, poster }: { src: string; poster?: string }) {
   return (
     <video
       className="pointer-events-none absolute inset-0 h-full w-full object-cover"
       src={src}
+      poster={poster || undefined}
       autoPlay
       muted
       loop

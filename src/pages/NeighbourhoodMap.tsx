@@ -12,7 +12,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import NavBar from '../components/NavBar';
 import CarIcon from '../components/CarIcon';
 import CategoryIcon from '../components/CategoryIcon';
-import { allBusinesses, responsiveSrcSet, type Business, type BusinessType } from '../data/businesses';
+import { allBusinesses, responsiveSrcSet, cldImageUrl, type Business, type BusinessType } from '../data/businesses';
 import { contactInfo } from '../data/hotelInfo';
 import {
   MAP_STYLE,
@@ -144,7 +144,7 @@ function PopupCard({ business, onView }: { business: Business; onView: () => voi
         className="flex gap-3 p-3"
       >
         <img
-          src={business.image.url}
+          src={cldImageUrl(business.image.url, 180)}
           srcSet={responsiveSrcSet(business.image.url, [120, 180])}
           sizes="64px"
           alt={business.name}

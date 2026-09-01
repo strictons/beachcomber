@@ -1,22 +1,25 @@
 import { useParams, Navigate, Link, useNavigate } from 'react-router-dom';
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import Hero from '../components/Hero';
 import NavBar from '../components/NavBar';
 import GalleryLightbox from '../components/GalleryLightbox';
 import CarIcon from '../components/CarIcon';
-import BusinessLocationMap from '../components/BusinessLocationMap';
 import WhatsOnSection from '../components/WhatsOnSection';
 import MenuAndBooking from '../components/MenuAndBooking';
 import RoomServiceNote from '../components/RoomServiceNote';
 import {
   getBusinessById,
   responsiveSrcSet,
+  cldImageUrl,
   todaysHours,
-  formatWebsiteLabel,
   eatAndDrink,
   thingsToDo,
 } from '../data/businesses';
 import { contactInfo } from '../data/hotelInfo';
+
+// maplibre-gl is ~600KB — only pulled in for the businesses that actually
+// have a location map (the "Nearby" ones with coordinates).
+const BusinessLocationMap = lazy(() => import('../components/BusinessLocationMap'));
 
 /** Swipe must be this far, and this much more horizontal than vertical, to count as a page-to-page swipe. */
 const SWIPE_DISTANCE_THRESHOLD = 60;
@@ -73,6 +76,29 @@ function MailIcon() {
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function InstagramIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="mt-0.5 shrink-0 text-neutral-400">
+      <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="17" cy="7" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FacebookIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="mt-0.5 shrink-0 text-neutral-400">
+      <path
+        d="M14 8.5V7c0-.8.5-1 1-1h1.5V3.5H14c-2.2 0-3.5 1.3-3.5 3.5v1.5H8.5V11h2v9.5H14V11h2.2l.5-2.5H14Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
         strokeLinejoin="round"
       />
     </svg>
@@ -283,15 +309,24 @@ export default function BusinessDetail() {
 
           <div className="my-6 border-t border-neutral-200/70" />
 
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
-            <div className="space-y-3">
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-1">
               {business.phone && (
                 <a
                   href={`tel:${business.phone.replace(/[^\d+]/g, '')}`}
                   className="flex items-center gap-2.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
                 >
                   <PhoneIcon />
-                  {business.phone}
+                  Phone
+                </a>
+              )}
+              {business.email && (
+                <a
+                  href={`mailto:${business.email}`}
+                  className="flex items-center gap-2.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
+                >
+                  <MailIcon />
+                  Email
                 </a>
               )}
               {business.website && (
@@ -299,52 +334,62 @@ export default function BusinessDetail() {
                   href={business.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-2.5 break-all text-[14px] font-medium text-[#1d1d1f] hover:underline"
+                  className="flex items-center gap-2.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
                 >
                   <GlobeIcon />
-                  {formatWebsiteLabel(business.website)}
+                  Website
                 </a>
               )}
-              {business.email && (
+              {business.instagram && (
                 <a
-                  href={`mailto:${business.email}`}
-                  className="flex items-start gap-2.5 break-all text-[14px] font-medium text-[#1d1d1f] hover:underline"
-                >
-                  <MailIcon />
-                  {business.email}
-                </a>
-              )}
-              <p className="flex items-start gap-2.5 text-[13px] text-neutral-500">
-                <PinIcon />
-                <span>{business.address}</span>
-              </p>
-            </div>
-
-            <div className="space-y-2 sm:text-right">
-              <p className="flex items-center gap-1.5 text-[13px] text-neutral-500 sm:justify-end">
-                {isNearby && <CarIcon />}
-                {driveTimeLabel}
-              </p>
-              {isNearby && (
-                <a
-                  href={directionsUrl}
+                  href={`https://www.instagram.com/${business.instagram}/`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
+                  className="flex items-center gap-2.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
                 >
-                  Get Directions
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M7 17L17 7M17 7H8M17 7V16"
-                      stroke="currentColor"
-                      strokeWidth="1.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <InstagramIcon />
+                  Instagram
+                </a>
+              )}
+              {business.facebook && (
+                <a
+                  href={business.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
+                >
+                  <FacebookIcon />
+                  Facebook
                 </a>
               )}
             </div>
+
+            <p className="flex items-start gap-2.5 text-[13px] text-neutral-500">
+              <PinIcon />
+              <span>
+                {business.address} · {driveTimeLabel}
+              </span>
+            </p>
+
+            {isNearby && (
+              <a
+                href={directionsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[14px] font-medium text-[#1d1d1f] hover:underline"
+              >
+                Get Directions
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M7 17L17 7M17 7H8M17 7V16"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+            )}
           </div>
         </div>
 
@@ -353,7 +398,9 @@ export default function BusinessDetail() {
             <h3 className="mb-4 font-heading text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
               Location
             </h3>
-            <BusinessLocationMap business={business as typeof business & { lat: number; lng: number }} />
+            <Suspense fallback={<div className="h-72 w-full rounded-2xl bg-neutral-100 sm:h-80" />}>
+              <BusinessLocationMap business={business as typeof business & { lat: number; lng: number }} />
+            </Suspense>
           </div>
         )}
 
@@ -371,7 +418,7 @@ export default function BusinessDetail() {
                   className="group aspect-square cursor-pointer overflow-hidden rounded-xl bg-neutral-100"
                 >
                   <img
-                    src={img.url}
+                    src={cldImageUrl(img.url, 570, img.upscale)}
                     srcSet={responsiveSrcSet(img.url, [380, 570, 760], img.upscale)}
                     sizes="(min-width: 640px) 380px, 45vw"
                     alt={`${business.name} photo ${i + 1}`}
