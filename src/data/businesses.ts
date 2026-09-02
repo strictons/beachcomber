@@ -105,7 +105,7 @@ const eatAndDrinkBase: Omit<Business, 'image' | 'gallery'>[] = [
     distanceKm: 0,
     tagline: 'Pub classics and cocktails right on the water.',
     description:
-      "Our bar and bistro serves delicious pub classics including burgers, steaks, seafood and wood-fired pizzas, paired with your favourite beers, wines and cocktails — a fantastic spot to grab a seat and enjoy dinner by the water.",
+      "Our bar and bistro serves delicious pub classics including burgers, steaks, seafood and wood-fired pizzas, paired with your favourite beers, wines and cocktails. A fantastic spot to grab a seat and enjoy dinner by the water.",
     hours: [{ day: 'Every day', hours: '11:00 AM – Late' }],
     schedule: [{ open: 11 * 60, close: 60 }],
     address: 'Level 3, The Beachcomber Hotel and Resort',

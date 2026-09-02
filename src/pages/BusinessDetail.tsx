@@ -267,7 +267,7 @@ export default function BusinessDetail() {
               Book a Class
             </a>
             <p className="mt-3 text-center text-[13px] text-neutral-500">
-              Classes are temporarily paused — please check back soon.
+              Classes are temporarily paused - please check back soon.
             </p>
           </div>
         )}
