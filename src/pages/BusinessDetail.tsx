@@ -137,6 +137,8 @@ export default function BusinessDetail() {
   const isNearby = business.location !== 'In-Hotel';
   const driveTimeLabel = isNearby ? `${business.minutesFromHotel} Min Drive` : 'On-Site';
   const todays = todaysHours(business);
+  // Saturday Yoga is on hold, so don't highlight a "Today" row in its hours.
+  const hoursPaused = business.id === 'saturday-yoga';
 
   // Swipe left/right moves between businesses within the same category
   // (Eat & Drink or Things To Do), in the same order they're listed on that
@@ -279,7 +281,7 @@ export default function BusinessDetail() {
 
           <ul className="-mx-3 mt-2">
             {business.hours.map((h) => {
-              const isToday = todays.includes(h);
+              const isToday = !hoursPaused && todays.includes(h);
               return (
                 <li
                   key={h.day}

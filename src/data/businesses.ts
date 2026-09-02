@@ -336,8 +336,7 @@ const thingsToDoBase: Omit<Business, 'image' | 'gallery'>[] = [
     tagline: 'Complimentary lakeside yoga every Saturday morning.',
     description:
       'Join us at 8am on Saturday mornings for a complimentary yoga session by the lake. No experience or equipment is required.',
-    hours: [{ day: 'Saturday', hours: '8:00 AM' }],
-    schedule: [{ days: [6], open: 8 * 60, close: 9 * 60 }],
+    hours: [{ day: 'Saturday', hours: 'Temporarily paused' }],
     phone: '(02) 4317 2845',
     address: 'Lakeside, The Beachcomber Hotel and Resort',
     website: hotelContactInfo.website,
