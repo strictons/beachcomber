@@ -409,13 +409,17 @@ export default function BusinessDetail() {
             <h3 className="mb-4 font-heading text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-400">
               Gallery
             </h3>
+            {/*
+              Tapping a thumbnail to open the full-screen lightbox is disabled
+              for now. To re-enable: wrap each <img> back in
+              `<button onClick={() => setLightboxIndex(i)} aria-label=...>` and
+              restore the `group`/`cursor-pointer`/`group-hover:scale-105` classes.
+            */}
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {business.gallery.map((img, i) => (
-                <button
+                <div
                   key={img.url}
-                  onClick={() => setLightboxIndex(i)}
-                  aria-label={`Open photo ${i + 1} of ${business.gallery.length}`}
-                  className="group aspect-square cursor-pointer overflow-hidden rounded-xl bg-neutral-100"
+                  className="aspect-square overflow-hidden rounded-xl bg-neutral-100"
                 >
                   <img
                     src={cldImageUrl(img.url, 570, img.upscale)}
@@ -425,9 +429,9 @@ export default function BusinessDetail() {
                     loading="lazy"
                     draggable={false}
                     style={{ objectPosition: img.position }}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    className="h-full w-full object-cover"
                   />
-                </button>
+                </div>
               ))}
             </div>
           </div>
