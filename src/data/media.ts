@@ -66,7 +66,7 @@ export const LOGO_URL = logoAsset;
 // =============================================================================
 
 export const HOME_HERO_VIDEO_URL =
-  'https://res.cloudinary.com/q4tmczid/video/upload/v1787028851/bchrbg-3.mp4';
+  'https://res.cloudinary.com/q4tmczid/video/upload/v1790238509/hf_20260924_082210_e0230f8f-210a-4eee-8661-f358824b502e.mp4';
 
 // =============================================================================
 // HOTEL INFORMATION — hero photo
